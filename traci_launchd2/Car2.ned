@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package inet.examples.traci_launchd;
+package inet.examples.Examples_Inet299.traci_launchd2;
 
 import inet.applications.traci.TraCIDemo;
 import inet.linklayer.ieee80211.Ieee80211Nic;
@@ -30,10 +30,13 @@ import inet.networklayer.ipv4.IPv4RoutingTable;
 import inet.transportlayer.udp.UDP;
 
 
-module Car
+module Car2
 {
     parameters:
         @node();
+        *.mobilityModule = default(absPath(".mobility"));
+        *.interfaceTableModule = default(absPath(".interfaceTable"));
+        *.routingTableModule = default(absPath(".routingTable"));
 
     gates:
         input radioIn @directIn;
@@ -53,6 +56,7 @@ module Car
         mobility: TraCIMobility {
             parameters:
                 @display("p=60,459");
+                traciScenarioManagerModule = default("manager");
         }
         routingTable: IPv4RoutingTable {
             parameters:

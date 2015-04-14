@@ -18,8 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package inet.examples.traci_launchd;
+package inet.examples.Examples_Inet299.traci_launchd2;
 
-network scenario extends Highway
+import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
+
+network scenario2 extends Highway2
 {
+    submodules:
+        configurator: IPv4NetworkConfigurator {
+            @display("p=135,48");
+        }
 }

@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package inet.examples.traci_launchd2M;
+package inet.examples.Examples_Inet299.traci_launchd2M;
 
 import inet.applications.traci.TraCIDemo;
 import inet.applications.udpapp.UDPBasicBurst;

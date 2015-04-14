@@ -18,16 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package inet.examples.traci_launchd;
+package inet.examples.Examples_Inet299.traci_launchd2;
 
 import inet.mobility.group.TraCIScenarioManagerLaunchd;
-import inet.physicallayer.ieee80211.Ieee80211RadioMedium;
+import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 
 
-module Highway
+module Highway2
 {
     submodules:
-        radioMedium: Ieee80211RadioMedium {
+        radioMedium: Ieee80211ScalarRadioMedium {
             parameters:
                 @display("p=256,128");
         }
