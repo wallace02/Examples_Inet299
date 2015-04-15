@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package inet.examples.Examples_Inet299.traci_launchd2M;
+package inet.examples.Examples_Inet299.traci_launchd2MR;
 
 import inet.applications.traci.TraCIDemo;
 import inet.applications.udpapp.UDPBasicBurst;
@@ -31,24 +31,31 @@ import inet.networklayer.ipv4.IPv4NetworkLayer;
 import inet.networklayer.ipv4.IPv4RoutingTable;
 import inet.transportlayer.udp.UDP;
 import inet.networklayer.contract.IManetRouting;
+import inet.routing.aodv.AODVRouting;
+import inet.linklayer.loopback.LoopbackInterface;
 
 
-module Car2M
+module Car2MR
 {
     parameters:
         @node();
+        @labels(node,ethernet-node,wireless-node);
         //*.mobilityModule = default(absPath(".mobility"));
-        *.interfaceTableModule = default(absPath(".interfaceTable"));
-        *.routingTableModule = default(absPath(".routingTable"));
+        **.interfaceTableModule = default(absPath(".interfaceTable"));
+        **.routingTableModule = default(absPath(".routingTable"));
+        **.networkProtocolModule = default(absPath(".networkLayer.ip"));
+        **.icmpModule = default(absPath(".networkLayer.icmp"));
 
-        string routingProtocol @enum("AODVUU","DYMOUM","DYMO","DSRUU","OLSR","OLSR_ETX","DSDV_2","Batman") = default("");
-
+        //string routingProtocol @enum("AODVUU","DYMOUM","DYMO","DSRUU","OLSR","OLSR_ETX","DSDV_2","Batman") = default("");
+        int numRadios = default(1);
     gates:
-        input radioIn @directIn;
+        input radioIn[numRadios] @directIn;
 
     submodules:
         ac_wlan: HostAutoConfigurator {
-            @display("p=296,402");
+            parameters:
+                @display("p=60,397");
+                interfaces = "wlan0";
         }
         interfaceTable: InterfaceTable {
             parameters:
@@ -57,7 +64,7 @@ module Car2M
         //        app: TraCIDemo {
         app: UDPBasicBurst {
             parameters:
-                @display("p=384,46");
+                @display("p=318,46");
         }
         mobility: TraCIMobility {
             parameters:
@@ -69,11 +76,11 @@ module Car2M
                 forwarding = true;
                 // routerId = "";
                 routingFile = "";
-                @display("p=60,326");
+                @display("p=60,294");
         }
         udp: UDP {
             parameters:
-                @display("p=384,146");
+                @display("p=318,168");
         }
         networkLayer: IPv4NetworkLayer {
             parameters:
@@ -83,12 +90,15 @@ module Car2M
                 ifIn[1];
                 ifOut[1];
         }
-        manetrouting: <routingProtocol> like IManetRouting if routingProtocol != "" {
-            @display("p=233,146");
+        aodv: AODVRouting {
+            @display("p=155,207");
         }
-        wlan: Ieee80211Nic {
+        wlan[numRadios]: Ieee80211Nic {
             parameters:
-                @display("p=304,461;q=queue");
+                @display("p=304,459,row,60;q=queue");
+        }
+        lo0: LoopbackInterface {
+            @display("p=172,461");
         }
     connections allowunconnected:
         udp.appOut++ --> app.udpIn;
@@ -97,12 +107,22 @@ module Car2M
         udp.ipOut --> networkLayer.transportIn++;
         udp.ipIn <-- networkLayer.transportOut++;
 
-        networkLayer.transportOut++ --> manetrouting.from_ip if routingProtocol != "";
-        networkLayer.transportIn++ <-- manetrouting.to_ip if routingProtocol != "";
+        networkLayer.transportOut++ --> aodv.ipIn;
+        networkLayer.transportIn++ <-- aodv.ipOut;
 
-        wlan.upperLayerOut --> networkLayer.ifIn[0];
-        wlan.upperLayerIn <-- networkLayer.ifOut[0];
+        networkLayer.ifOut++ --> lo0.upperLayerIn;
+        lo0.upperLayerOut --> networkLayer.ifIn++;
 
-        radioIn --> wlan.radioIn;
+        for i=0..sizeof(radioIn)-1 {
+            radioIn[i] --> { @display("m=s"); } --> wlan[i].radioIn;
+            wlan[i].upperLayerOut --> networkLayer.ifIn++;
+            wlan[i].upperLayerIn <-- networkLayer.ifOut++;
+        }
+
+        //wlan.upperLayerOut --> networkLayer.ifIn[0];
+        //wlan.upperLayerIn <-- networkLayer.ifOut[0];
+
+        //radioIn --> wlan.radioIn;
+
 }
 

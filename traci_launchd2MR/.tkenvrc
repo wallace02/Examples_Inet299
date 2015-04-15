@@ -1,4 +1,4 @@
 # Partial OMNeT++/Tkenv config file -- see $HOME/.tkenvrc as well
-config default-configname	{AODVrouting-Erlangen}
+config default-configname	{AODVRouting-Erlangen}
 config default-runnumber	{0}
 
